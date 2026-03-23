@@ -187,10 +187,22 @@ export default function App() {
     });
     
     // Sort dates descending
-    return Object.keys(groups).sort((a, b) => b.localeCompare(a)).map(date => ({
-      date,
-      entries: groups[date]
-    }));
+    return Object.keys(groups).sort((a, b) => b.localeCompare(a)).map(date => {
+      const sortedEntries = groups[date].sort((a, b) => {
+        const order = {
+          'RETURN': 1,
+          'MDF_ONLY': 2,
+          'HARDWARE': 3,
+          'OTHER': 4
+        };
+        return order[a.statusType] - order[b.statusType];
+      });
+
+      return {
+        date,
+        entries: sortedEntries
+      };
+    });
   }, [filteredEntries]);
 
   const stats = useMemo(() => {
