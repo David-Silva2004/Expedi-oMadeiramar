@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "ShippingEntry": {
+      "title": "ShippingEntry",
+      "description": "A record of a shipping dispatch.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this record."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the sale/dispatch in YYYY-MM-DD format."
+        },
+        "orderNumber": {
+          "type": "string",
+          "description": "The order or sale number."
+        },
+        "customer": {
+          "type": "string",
+          "description": "The name of the customer."
+        },
+        "statusType": {
+          "type": "string",
+          "enum": ["MDF_ONLY", "RETURN", "HARDWARE", "OTHER"],
+          "description": "The type of dispatch."
+        },
+        "volumes": {
+          "type": "number",
+          "description": "The number of volumes, if applicable."
+        },
+        "otherDescription": {
+          "type": "string",
+          "description": "Description for OTHER status."
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp of creation."
+        }
+      },
+      "required": ["userId", "date", "orderNumber", "customer", "statusType", "createdAt"]
+    }
+  },
+  "firestore": {
+    "shipping_entries/{entryId}": {
+      "schema": {
+        "$ref": "#/entities/ShippingEntry"
+      },
+      "description": "Collection of shipping dispatch records."
+    }
+  }
+}

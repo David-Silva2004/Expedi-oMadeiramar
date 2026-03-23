@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: shipping_entries
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - ID of the user who owns this record
+    //   - date: string (required) - Date in YYYY-MM-DD format
+    //   - orderNumber: string (required) - Order or sale number
+    //   - customer: string (required) - Name of the customer
+    //   - statusType: string (required) - One of 'MDF_ONLY', 'RETURN', 'HARDWARE', 'OTHER'
+    //   - volumes: number (optional) - Number of volumes
+    //   - otherDescription: string (optional) - Description for OTHER status
+    //   - createdAt: number (required) - Timestamp of creation
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function uidUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidOptionalNumber(field, minVal, maxVal) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is number &&
+              request.resource.data[field] >= minVal &&
+              request.resource.data[field] <= maxVal);
+    }
+
+    function isValidStatusType() {
+      return request.resource.data.statusType in ['MDF_ONLY', 'RETURN', 'HARDWARE', 'OTHER'];
+    }
+
+    function isValidShippingEntry() {
+      return hasRequiredFields(['userId', 'date', 'orderNumber', 'customer', 'statusType', 'createdAt']) &&
+             request.resource.data.userId is string &&
+             validStringLength('date', 10, 10) &&
+             validStringLength('orderNumber', 1, 50) &&
+             validStringLength('customer', 1, 100) &&
+             isValidStatusType() &&
+             isValidOptionalNumber('volumes', 1, 1000) &&
+             isValidOptionalString('otherDescription', 1, 100) &&
+             request.resource.data.createdAt is number;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /shipping_entries/{entryId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) && 
+                       uidUnchanged() && 
+                       isValidShippingEntry();
+      allow update: if isDocOwner() && 
+                       uidNotModified() && 
+                       isValidShippingEntry() &&
+                       request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isDocOwner();
+    }
+  }
+}
