@@ -96,7 +96,7 @@ export function ShippingForm({ entry, onSave, onClose }: Props) {
               <input 
                 type="number" 
                 min="1" 
-                max="10"
+                max="30"
                 required 
                 value={volumes} 
                 onChange={e => {
