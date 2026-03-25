@@ -94,7 +94,7 @@ export default function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(true);
 
   useEffect(() => {
     if (isLocalTestMode) {
