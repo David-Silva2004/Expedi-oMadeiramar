@@ -1,0 +1,189 @@
+[2m09:48:25[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to load url /src/App.tsx (resolved id: C:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx) in C:/Users/Allyne/Documents/Expedi-oMadeiramar/src/main.tsx. Does the file exist?
+[2m10:03:32[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to load url /src/store.ts (resolved id: C:/Users/Allyne/Documents/Expedi-oMadeiramar/src/store.ts) in C:/Users/Allyne/Documents/Expedi-oMadeiramar/src/index.css. Does the file exist?
+[2m11:06:52[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to resolve import "./legacyImport" from "src/App.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx[39m:22:64
+[33m  22 |  import { isLocalTestMode } from "./config";
+  23 |  import { auth } from "./firebase";
+  24 |  import { parseLegacyImportSheets } from "./legacyImport";
+     |                                           ^
+  25 |  import { useShippingStore } from "./store";
+  26 |  export default function App() {[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42528:41)
+      at TransformPluginContext.error (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42525:16)
+      at normalizeUrl (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40504:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40623:37
+      at async Promise.all (index 9)
+      at async TransformPluginContext.transform (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40550:7)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42323:18)
+      at async loadAndTransform (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:35739:27)
+      at async viteTransformMiddleware (file:///C:/Users/Allyne/Documents/Expedi-oMadeiramar/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:37254:24)
+[2m11:12:31[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\Users\Allyne\Documents\Expedi-oMadeiramar\src\App.tsx: Identifier 'formatStatus' has already been declared. (422:8)
+
+[0m [90m 420 |[31m   }[33m;[31m
+ [90m 421 |[31m
+[31m[1m>[22m[31m[90m 422 |[31m   [36mconst[31m formatStatus [33m=[31m (entry[33m:[31m [33mShippingEntry[31m) [33m=>[31m {
+ [90m     |[31m         [31m[1m^[22m[31m
+ [90m 423 |[31m     [36mswitch[31m (entry[33m.[31mstatusType) {
+ [90m 424 |[31m       [36mcase[31m [32m'MDF_ONLY'[31m[33m:[31m
+ [90m 425 |[31m         [36mreturn[31m [32m'X'[31m[33m;[31m[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx[39m:422:8
+[33m  420|    };
+  421|  
+  422|    const formatStatus = (entry: ShippingEntry) => {
+     |          ^
+  423|      switch (entry.statusType) {
+  424|        case 'MDF_ONLY':[39m
+      at constructor (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:365:19)
+      at TypeScriptParserMixin.raise (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:6599:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:1619:19)
+      at TypeScriptScopeHandler.declareName (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:1585:12)
+      at TypeScriptScopeHandler.declareName (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:4880:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7567:16)
+      at TypeScriptParserMixin.checkIdentifier (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7563:12)
+      at TypeScriptParserMixin.checkLVal (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7500:12)
+      at TypeScriptParserMixin.parseVarId (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13412:10)
+      at TypeScriptParserMixin.parseVarId (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9752:11)
+      at TypeScriptParserMixin.parseVar (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13383:12)
+      at TypeScriptParserMixin.parseVarStatement (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13230:10)
+      at TypeScriptParserMixin.parseVarStatement (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9408:31)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12851:23)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9508:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12767:17)
+      at TypeScriptParserMixin.parseStatementListItem (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12747:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13316:61)
+      at TypeScriptParserMixin.parseBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13309:10)
+      at TypeScriptParserMixin.parseBlock (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13297:10)
+      at TypeScriptParserMixin.parseFunctionBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12100:24)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12086:10)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9172:18)
+      at C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13445:12
+      at TypeScriptParserMixin.withSmartMixTopicForbiddingContext (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12403:14)
+      at TypeScriptParserMixin.parseFunction (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13444:10)
+      at TypeScriptParserMixin.parseExportDefaultExpression (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13907:19)
+      at TypeScriptParserMixin.parseExportDefaultExpression (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9402:18)
+      at TypeScriptParserMixin.parseExport (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13828:25)
+      at TypeScriptParserMixin.parseExport (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9385:20)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12878:27)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9508:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12767:17)
+      at TypeScriptParserMixin.parseModuleItem (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12744:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13316:36)
+      at TypeScriptParserMixin.parseBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13309:10)
+      at TypeScriptParserMixin.parseProgram (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12622:10)
+      at TypeScriptParserMixin.parseTopLevel (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12612:25)
+      at TypeScriptParserMixin.parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:14488:25)
+      at TypeScriptParserMixin.parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:10126:18)
+      at parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:14522:38)
+      at parser (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\parser\index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transformation\normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transformation\index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\gensync\index.js:261:32)
+[2m11:12:31[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: C:\Users\Allyne\Documents\Expedi-oMadeiramar\src\App.tsx: Identifier 'formatStatus' has already been declared. (422:8)
+
+[0m [90m 420 |[39m   }[33m;[39m
+ [90m 421 |[39m
+[31m[1m>[22m[39m[90m 422 |[39m   [36mconst[39m formatStatus [33m=[39m (entry[33m:[39m [33mShippingEntry[39m) [33m=>[39m {
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 423 |[39m     [36mswitch[39m (entry[33m.[39mstatusType) {
+ [90m 424 |[39m       [36mcase[39m [32m'MDF_ONLY'[39m[33m:[39m
+ [90m 425 |[39m         [36mreturn[39m [32m'X'[39m[33m;[39m[0m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx[39m:422:8
+[33m  420|    };
+  421|  
+  422|    const formatStatus = (entry: ShippingEntry) => {
+     |          ^
+  423|      switch (entry.statusType) {
+  424|        case 'MDF_ONLY':[39m
+[2m11:12:31[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: C:\Users\Allyne\Documents\Expedi-oMadeiramar\src\App.tsx: Identifier 'formatStatus' has already been declared. (422:8)
+
+[0m [90m 420 |[39m   }[33m;[39m
+ [90m 421 |[39m
+[31m[1m>[22m[39m[90m 422 |[39m   [36mconst[39m formatStatus [33m=[39m (entry[33m:[39m [33mShippingEntry[39m) [33m=>[39m {
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 423 |[39m     [36mswitch[39m (entry[33m.[39mstatusType) {
+ [90m 424 |[39m       [36mcase[39m [32m'MDF_ONLY'[39m[33m:[39m
+ [90m 425 |[39m         [36mreturn[39m [32m'X'[39m[33m;[39m[0m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx[39m:422:8
+[33m  420|    };
+  421|  
+  422|    const formatStatus = (entry: ShippingEntry) => {
+     |          ^
+  423|      switch (entry.statusType) {
+  424|        case 'MDF_ONLY':[39m
+[2m11:12:31[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\Users\Allyne\Documents\Expedi-oMadeiramar\src\App.tsx: Identifier 'formatStatus' has already been declared. (422:8)
+
+[0m [90m 420 |[31m   }[33m;[31m
+ [90m 421 |[31m
+[31m[1m>[22m[31m[90m 422 |[31m   [36mconst[31m formatStatus [33m=[31m (entry[33m:[31m [33mShippingEntry[31m) [33m=>[31m {
+ [90m     |[31m         [31m[1m^[22m[31m
+ [90m 423 |[31m     [36mswitch[31m (entry[33m.[31mstatusType) {
+ [90m 424 |[31m       [36mcase[31m [32m'MDF_ONLY'[31m[33m:[31m
+ [90m 425 |[31m         [36mreturn[31m [32m'X'[31m[33m;[31m[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/Users/Allyne/Documents/Expedi-oMadeiramar/src/App.tsx[39m:422:8
+[33m  420|    };
+  421|  
+  422|    const formatStatus = (entry: ShippingEntry) => {
+     |          ^
+  423|      switch (entry.statusType) {
+  424|        case 'MDF_ONLY':[39m
+      at constructor (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:365:19)
+      at TypeScriptParserMixin.raise (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:6599:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:1619:19)
+      at TypeScriptScopeHandler.declareName (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:1585:12)
+      at TypeScriptScopeHandler.declareName (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:4880:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7567:16)
+      at TypeScriptParserMixin.checkIdentifier (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7563:12)
+      at TypeScriptParserMixin.checkLVal (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:7500:12)
+      at TypeScriptParserMixin.parseVarId (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13412:10)
+      at TypeScriptParserMixin.parseVarId (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9752:11)
+      at TypeScriptParserMixin.parseVar (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13383:12)
+      at TypeScriptParserMixin.parseVarStatement (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13230:10)
+      at TypeScriptParserMixin.parseVarStatement (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9408:31)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12851:23)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9508:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12767:17)
+      at TypeScriptParserMixin.parseStatementListItem (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12747:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13316:61)
+      at TypeScriptParserMixin.parseBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13309:10)
+      at TypeScriptParserMixin.parseBlock (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13297:10)
+      at TypeScriptParserMixin.parseFunctionBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12100:24)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12086:10)
+      at TypeScriptParserMixin.parseFunctionBodyAndFinish (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9172:18)
+      at C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13445:12
+      at TypeScriptParserMixin.withSmartMixTopicForbiddingContext (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12403:14)
+      at TypeScriptParserMixin.parseFunction (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13444:10)
+      at TypeScriptParserMixin.parseExportDefaultExpression (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13907:19)
+      at TypeScriptParserMixin.parseExportDefaultExpression (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9402:18)
+      at TypeScriptParserMixin.parseExport (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13828:25)
+      at TypeScriptParserMixin.parseExport (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9385:20)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12878:27)
+      at TypeScriptParserMixin.parseStatementContent (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:9508:18)
+      at TypeScriptParserMixin.parseStatementLike (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12767:17)
+      at TypeScriptParserMixin.parseModuleItem (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12744:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13316:36)
+      at TypeScriptParserMixin.parseBlockBody (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:13309:10)
+      at TypeScriptParserMixin.parseProgram (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12622:10)
+      at TypeScriptParserMixin.parseTopLevel (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:12612:25)
+      at TypeScriptParserMixin.parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:14488:25)
+      at TypeScriptParserMixin.parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:10126:18)
+      at parse (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\parser\lib\index.js:14522:38)
+      at parser (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\parser\index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transformation\normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transformation\index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\@babel\core\lib\transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (C:\Users\Allyne\Documents\Expedi-oMadeiramar\node_modules\gensync\index.js:261:32)

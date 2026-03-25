@@ -10,7 +10,7 @@ interface Props {
 
 export function ShippingForm({ entry, onSave, onClose }: Props) {
   const [date, setDate] = useState(entry?.date || new Date().toISOString().split('T')[0]);
-  const [orderNumber, setOrderNumber] = useState(entry?.orderNumber || '');
+  const [orderNumber, setOrderNumber] = useState((entry?.orderNumber || '').replace(/\D/g, ''));
   const [customer, setCustomer] = useState(entry?.customer || '');
   const [statusType, setStatusType] = useState<StatusType>(entry?.statusType || 'MDF_ONLY');
   const [volumes, setVolumes] = useState<number>(entry?.volumes || 1);
@@ -18,9 +18,17 @@ export function ShippingForm({ entry, onSave, onClose }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const normalizedOrderNumber = orderNumber.replace(/\D/g, '');
+
+    if (!normalizedOrderNumber) {
+      alert('O código do pedido deve conter apenas números.');
+      return;
+    }
+
     onSave({
       date,
-      orderNumber,
+      orderNumber: normalizedOrderNumber,
       customer,
       statusType,
       volumes: statusType === 'HARDWARE' ? volumes : undefined,
@@ -58,10 +66,14 @@ export function ShippingForm({ entry, onSave, onClose }: Props) {
               type="text" 
               required 
               value={orderNumber} 
-              onChange={e => setOrderNumber(e.target.value)} 
+              onChange={e => setOrderNumber(e.target.value.replace(/\D/g, ''))} 
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" 
+              inputMode="numeric"
+              pattern="[0-9]*"
+              title="Digite apenas números"
               placeholder="Ex: 172974" 
             />
+            <p className="mt-1 text-xs text-gray-500">Aceita somente números e não permite repetir o mesmo pedido no mesmo dia.</p>
           </div>
           
           <div>
