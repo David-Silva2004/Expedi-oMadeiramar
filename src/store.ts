@@ -10,6 +10,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -39,6 +40,7 @@ const LOCAL_DEV_USER_ID = 'local-dev-user';
 
 interface UseShippingStoreOptions {
   enableConsistencyNotes?: boolean;
+  readAllEntries?: boolean;
 }
 
 function formatInputDate(date: Date) {
@@ -191,8 +193,8 @@ function createLocalId() {
   return `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo: FirestoreErrorInfo = {
+function createFirestoreErrorInfo(error: unknown, operationType: OperationType, path: string | null) {
+  return {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
       userId: auth.currentUser?.uid,
@@ -201,16 +203,29 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
     operationType,
     path,
   };
-
-  console.error('Firestore Error:', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
 }
 
-export function useShippingStore({ enableConsistencyNotes = false }: UseShippingStoreOptions = {}) {
+function formatFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = createFirestoreErrorInfo(error, operationType, path);
+
+  console.error('Firestore Error:', JSON.stringify(errInfo));
+  return JSON.stringify(errInfo);
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  throw new Error(formatFirestoreError(error, operationType, path));
+}
+
+export function useShippingStore({
+  enableConsistencyNotes = false,
+  readAllEntries = false,
+}: UseShippingStoreOptions = {}) {
   const [entries, setEntries] = useState<ShippingEntry[]>([]);
   const [consistencyNotes, setConsistencyNotes] = useState<ConsistencyNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [notesLoading, setNotesLoading] = useState(enableConsistencyNotes);
+  const [entriesError, setEntriesError] = useState<string | null>(null);
+  const [notesError, setNotesError] = useState<string | null>(null);
   const currentUserId = auth.currentUser?.uid;
   const currentUserEmail = auth.currentUser?.email;
 
@@ -218,6 +233,7 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
     if (isLocalTestMode) {
       const syncLocalEntries = () => {
         setEntries(sortEntries(readLocalEntries()));
+        setEntriesError(null);
         setLoading(false);
       };
 
@@ -235,13 +251,17 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
 
     if (!currentUserId) {
       setEntries([]);
+      setEntriesError(null);
       setLoading(false);
       return;
     }
 
     setLoading(true);
+    setEntriesError(null);
 
-    const entriesQuery = query(collection(db, 'shipping_entries'), orderBy('createdAt', 'desc'));
+    const entriesQuery = readAllEntries
+      ? query(collection(db, 'shipping_entries'), orderBy('createdAt', 'desc'))
+      : query(collection(db, 'shipping_entries'), where('userId', '==', currentUserId), orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(
       entriesQuery,
@@ -253,19 +273,23 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
         });
 
         setEntries(nextEntries);
+        setEntriesError(null);
         setLoading(false);
       },
       (error) => {
-        handleFirestoreError(error, OperationType.LIST, 'shipping_entries');
+        setEntries([]);
+        setEntriesError(formatFirestoreError(error, OperationType.LIST, 'shipping_entries'));
+        setLoading(false);
       },
     );
 
     return () => unsubscribe();
-  }, [currentUserId]);
+  }, [currentUserId, readAllEntries]);
 
   useEffect(() => {
     if (!enableConsistencyNotes) {
       setConsistencyNotes([]);
+      setNotesError(null);
       setNotesLoading(false);
       return;
     }
@@ -273,6 +297,7 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
     if (isLocalTestMode) {
       const syncLocalNotes = () => {
         setConsistencyNotes(readLocalConsistencyNotes());
+        setNotesError(null);
         setNotesLoading(false);
       };
 
@@ -290,11 +315,13 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
 
     if (!currentUserId) {
       setConsistencyNotes([]);
+      setNotesError(null);
       setNotesLoading(false);
       return;
     }
 
     setNotesLoading(true);
+    setNotesError(null);
 
     const unsubscribe = onSnapshot(
       collection(db, 'consistency_notes'),
@@ -306,10 +333,13 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
         });
 
         setConsistencyNotes(sortConsistencyNotes(nextNotes));
+        setNotesError(null);
         setNotesLoading(false);
       },
       (error) => {
-        handleFirestoreError(error, OperationType.LIST, 'consistency_notes');
+        setConsistencyNotes([]);
+        setNotesError(formatFirestoreError(error, OperationType.LIST, 'consistency_notes'));
+        setNotesLoading(false);
       },
     );
 
@@ -535,6 +565,8 @@ export function useShippingStore({ enableConsistencyNotes = false }: UseShipping
     consistencyNotes,
     loading,
     notesLoading,
+    entriesError,
+    notesError,
     addEntry,
     importEntries,
     updateEntry,

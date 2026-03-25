@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, User } from 'firebase/auth';
 import { ShippingForm } from './components/ShippingForm';
 import { isAdminEmail, isLocalTestMode } from './config';
 import { auth } from './firebase';
@@ -94,7 +94,7 @@ export default function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     if (isLocalTestMode) {
@@ -127,6 +127,21 @@ export default function App() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setLoginError('');
+    setIsLoggingIn(true);
+
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Error signing in with Google', error);
+      setLoginError('Nao foi possivel entrar com Google. Confira se o provedor Google esta habilitado no Firebase Auth.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -135,11 +150,15 @@ export default function App() {
     }
   };
 
+  const isAdminUser = isLocalTestMode || isAdminEmail(user?.email);
+
   const {
     entries,
     consistencyNotes,
     loading: storeLoading,
     notesLoading,
+    entriesError,
+    notesError,
     addEntry,
     importEntries,
     updateEntry,
@@ -148,7 +167,7 @@ export default function App() {
     isLocalMode,
     resetTestData,
   } =
-    useShippingStore({ enableConsistencyNotes: isLocalTestMode || isAdminEmail(user?.email) });
+    useShippingStore({ enableConsistencyNotes: isAdminUser, readAllEntries: isAdminUser });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -162,7 +181,7 @@ export default function App() {
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const legacyFileInputRef = useRef<HTMLInputElement | null>(null);
   const deferredQualitySearchTerm = useDeferredValue(qualitySearchTerm);
-  const userRole: UserRole = isLocalTestMode || isAdminEmail(user?.email) ? 'admin' : 'operator';
+  const userRole: UserRole = isAdminUser ? 'admin' : 'operator';
   const canAccessAdminPages = userRole === 'admin';
   const visiblePage: ActivePage = canAccessAdminPages ? activePage : 'expeditions';
 
@@ -987,7 +1006,7 @@ export default function App() {
               Expedicao<span className="text-blue-600">Madeiramar</span>
             </h1>
             <p className="mt-2 text-sm text-gray-500">
-              Entre com email e senha. Contas listadas em `VITE_ADMIN_EMAILS` entram com acesso de admin; as demais ficam na operacao de expedicao.
+              Entre com email/senha ou Google. Contas listadas em `VITE_ADMIN_EMAILS` entram com acesso de admin; as demais ficam na operacao de expedicao.
             </p>
           </div>
 
@@ -1025,6 +1044,15 @@ export default function App() {
             className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoggingIn ? 'Entrando...' : 'Entrar'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isLoggingIn}
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoggingIn ? 'Aguarde...' : 'Entrar com Google'}
           </button>
         </form>
       </div>
@@ -1437,6 +1465,12 @@ export default function App() {
             </div>
           </div>
 
+          {notesError && (
+            <div className="border-b border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-900">
+              As observacoes nao puderam ser carregadas do Firebase. A auditoria continua disponivel, mas as notas do admin dependem das regras da colecao `consistency_notes`.
+            </div>
+          )}
+
           {filteredDuplicateOrders.length === 0 ? (
             <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 px-6 py-12 text-center text-gray-500">
               <AlertTriangle size={28} className="text-gray-300" />
@@ -1768,7 +1802,7 @@ export default function App() {
                 </React.Fragment>
               ))}
 
-              {!storeLoading && filteredEntries.length === 0 && (
+              {!storeLoading && !entriesError && filteredEntries.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500 print:hidden">
                     <div className="flex flex-col items-center justify-center gap-2">
@@ -1779,6 +1813,20 @@ export default function App() {
                           Limpar busca
                         </button>
                       )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+
+              {!storeLoading && entriesError && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-red-700 print:hidden">
+                    <div className="mx-auto max-w-2xl rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-left">
+                      <p className="font-semibold text-red-900">Nao foi possivel carregar os registros.</p>
+                      <p className="mt-2 text-sm leading-6 text-red-800">
+                        A leitura no Firebase falhou. Se essa conta for operacional, ela agora tenta ler apenas os
+                        registros do proprio usuario. Se continuar falhando, revise as regras do Firestore.
+                      </p>
                     </div>
                   </td>
                 </tr>
