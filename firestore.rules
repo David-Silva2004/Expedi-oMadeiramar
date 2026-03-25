@@ -28,6 +28,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.email is string &&
+        request.auth.token.email == 'admin@admin.com';
+    }
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
@@ -84,21 +90,44 @@ service cloud.firestore {
              request.resource.data.createdAt is number;
     }
 
+    function isValidConsistencyNote() {
+      return hasRequiredFields(['orderNumber', 'note', 'updatedAt', 'updatedByUid']) &&
+        request.resource.data.orderNumber is string &&
+        request.resource.data.orderNumber.size() >= 1 &&
+        request.resource.data.orderNumber.size() <= 50 &&
+        request.resource.data.note is string &&
+        request.resource.data.note.size() <= 4000 &&
+        request.resource.data.updatedAt is number &&
+        request.resource.data.updatedByUid is string &&
+        request.resource.data.updatedByUid == request.auth.uid &&
+        (
+          !('updatedByEmail' in request.resource.data) ||
+          request.resource.data.updatedByEmail == null ||
+          request.resource.data.updatedByEmail is string
+        );
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
 
     match /shipping_entries/{entryId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated() && 
-                       isOwner(request.resource.data.userId) && 
+      allow read: if isAdmin() || isDocOwner();
+      allow create: if isAuthenticated() &&
+                       (isAdmin() || isOwner(request.resource.data.userId)) &&
                        uidUnchanged() && 
                        isValidShippingEntry();
-      allow update: if isDocOwner() && 
+      allow update: if (isAdmin() || isDocOwner()) &&
                        uidNotModified() && 
                        isValidShippingEntry() &&
                        request.resource.data.createdAt == resource.data.createdAt;
-      allow delete: if isDocOwner();
+      allow delete: if isAdmin() || isDocOwner();
+    }
+
+    match /consistency_notes/{orderNumber} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && isValidConsistencyNote();
+      allow delete: if isAdmin();
     }
   }
 }
