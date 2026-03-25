@@ -1006,7 +1006,7 @@ export default function App() {
               Expedicao<span className="text-blue-600">Madeiramar</span>
             </h1>
             <p className="mt-2 text-sm text-gray-500">
-              Entre com email/senha ou Google. Contas listadas em `VITE_ADMIN_EMAILS` entram com acesso de admin; as demais ficam na operacao de expedicao.
+              Entre com email/senha ou Google.
             </p>
           </div>
 
