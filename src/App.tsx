@@ -112,6 +112,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoginError('');
@@ -531,6 +532,44 @@ export default function App() {
     setActivePage('expeditions');
     setIsFormOpen(true);
   };
+
+  useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+
+      const tagName = target.tagName;
+
+      return (
+        target.isContentEditable ||
+        tagName === 'INPUT' ||
+        tagName === 'TEXTAREA' ||
+        tagName === 'SELECT'
+      );
+    };
+
+    const handleNewEntryShortcut = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 's' || !event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+      }
+
+      if (isTypingTarget(event.target)) {
+        return;
+      }
+
+      event.preventDefault();
+      setEditingEntry(undefined);
+      setActivePage('expeditions');
+      setIsFormOpen(true);
+    };
+
+    window.addEventListener('keydown', handleNewEntryShortcut);
+
+    return () => {
+      window.removeEventListener('keydown', handleNewEntryShortcut);
+    };
+  }, []);
 
   const formatDate = (dateString: string) => {
     try {
@@ -1087,6 +1126,8 @@ export default function App() {
               </button>
               <button
                 onClick={openNewEntryForm}
+                aria-keyshortcuts="Alt+S"
+                title="Alt + S"
                 className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
                 Cadastrar pedido
@@ -1924,11 +1965,15 @@ export default function App() {
 
             <button
               onClick={openNewEntryForm}
+              aria-keyshortcuts="Alt+S"
+              title="Alt + S"
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               <Plus size={18} />
               <span className="hidden sm:inline">Nova Expedicao</span>
             </button>
+
+              
 
             {isLocalMode ? (
               <button
