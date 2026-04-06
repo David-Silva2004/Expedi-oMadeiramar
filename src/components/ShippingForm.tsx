@@ -3,18 +3,41 @@ import { StatusType, ShippingEntry } from '../types';
 import { X } from 'lucide-react';
 
 interface Props {
+  customerSuggestions?: string[];
   entry?: ShippingEntry;
   onSave: (entry: Omit<ShippingEntry, 'id' | 'userId' | 'createdAt'>) => void;
   onClose: () => void;
 }
 
-export function ShippingForm({ entry, onSave, onClose }: Props) {
+function normalizeCustomerSuggestion(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+export function ShippingForm({ customerSuggestions = [], entry, onSave, onClose }: Props) {
   const [date, setDate] = useState(entry?.date || new Date().toISOString().split('T')[0]);
   const [orderNumber, setOrderNumber] = useState((entry?.orderNumber || '').replace(/\D/g, ''));
   const [customer, setCustomer] = useState(entry?.customer || '');
   const [statusType, setStatusType] = useState<StatusType>(entry?.statusType || 'MDF_ONLY');
   const [volumes, setVolumes] = useState<number>(entry?.volumes || 1);
   const [otherDescription, setOtherDescription] = useState(entry?.otherDescription || '');
+  const normalizedCustomerSearch = normalizeCustomerSuggestion(customer);
+  const filteredCustomerSuggestions = customerSuggestions
+    .filter((suggestion) => {
+      const normalizedSuggestion = normalizeCustomerSuggestion(suggestion);
+
+      if (!normalizedCustomerSearch) {
+        return true;
+      }
+
+      return normalizedSuggestion.includes(normalizedCustomerSearch);
+    })
+    .filter((suggestion) => normalizeCustomerSuggestion(suggestion) !== normalizedCustomerSearch)
+    .slice(0, 6);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,9 +106,36 @@ export function ShippingForm({ entry, onSave, onClose }: Props) {
               required 
               value={customer} 
               onChange={e => setCustomer(e.target.value)} 
+              list={customerSuggestions.length > 0 ? 'recent-customer-suggestions' : undefined}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" 
               placeholder="Ex: MARCOS EVANGELISTA" 
             />
+            {customerSuggestions.length > 0 && (
+              <datalist id="recent-customer-suggestions">
+                {customerSuggestions.map((suggestion) => (
+                  <option key={suggestion} value={suggestion} />
+                ))}
+              </datalist>
+            )}
+            {customer.trim() && filteredCustomerSuggestions.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {filteredCustomerSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => setCustomer(suggestion)}
+                    className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+            {customerSuggestions.length > 0 && (
+              <p className="mt-1 text-xs text-gray-500">
+                Sugestoes opcionais com base nos clientes expedidos nos ultimos 7 dias.
+              </p>
+            )}
           </div>
           
           <div>

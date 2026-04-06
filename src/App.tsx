@@ -10,13 +10,15 @@ import {
   Plus,
   Printer,
   Search,
+  Sparkles,
   Trash2,
   Upload,
 } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, User } from 'firebase/auth';
 import { ShippingForm } from './components/ShippingForm';
+import { UpdateNoticeModal } from './components/UpdateNoticeModal';
 import { isAdminEmail, isLocalTestMode } from './config';
 import { auth } from './firebase';
 import {
@@ -26,6 +28,7 @@ import {
 } from './legacyImport';
 import { useShippingStore } from './store';
 import { ConsistencyNote, ShippingEntry, UserRole } from './types';
+import { currentUpdateNotice, UPDATE_NOTICE_STORAGE_KEY } from './updateNotice';
 
 type ActivePage = 'dashboard' | 'expeditions' | 'quality';
 
@@ -151,6 +154,34 @@ export default function App() {
     }
   };
 
+  const handleCloseUpdateNotice = () => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(UPDATE_NOTICE_STORAGE_KEY, currentUpdateNotice.id);
+    }
+
+    setIsUpdateNoticeOpen(false);
+  };
+
+  const handleOpenUpdateNotice = () => {
+    setIsUpdateNoticeOpen(true);
+  };
+
+  const handleResetLocalTestData = () => {
+    if (!isLocalMode) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      'Isso vai apagar os dados locais de teste deste navegador e recarregar apenas os exemplos. Os dados reais do Firebase nao serao alterados. Deseja continuar?',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    resetTestData();
+  };
+
   const isAdminUser = isLocalTestMode || isAdminEmail(user?.email);
 
   const {
@@ -178,6 +209,7 @@ export default function App() {
   const [isSavingImportReview, setIsSavingImportReview] = useState(false);
   const [savingNoteOrderNumber, setSavingNoteOrderNumber] = useState<string | null>(null);
   const [importReview, setImportReview] = useState<ImportReviewState | null>(null);
+  const [isUpdateNoticeOpen, setIsUpdateNoticeOpen] = useState(false);
   const [qualitySearchTerm, setQualitySearchTerm] = useState('');
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const legacyFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -195,6 +227,23 @@ export default function App() {
       setActivePage('expeditions');
     }
   }, [activePage, canAccessAdminPages, user]);
+
+  useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!isLocalTestMode && !user) {
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const lastSeenUpdateId = window.localStorage.getItem(UPDATE_NOTICE_STORAGE_KEY);
+    setIsUpdateNoticeOpen(lastSeenUpdateId !== currentUpdateNotice.id);
+  }, [authLoading, user]);
 
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
@@ -239,12 +288,70 @@ export default function App() {
   }, [filteredEntries]);
 
   const todayKey = format(new Date(), 'yyyy-MM-dd');
+  const recentCustomerWindowStart = format(subDays(new Date(), 6), 'yyyy-MM-dd');
 
   useEffect(() => {
     if (user && !canAccessAdminPages && !filterDate) {
       setFilterDate(todayKey);
     }
   }, [canAccessAdminPages, filterDate, todayKey, user]);
+
+  const recentCustomerSuggestions = useMemo(() => {
+    const customersByKey = new Map<
+      string,
+      {
+        customer: string;
+        lastDate: string;
+        lastCreatedAt: number;
+        count: number;
+      }
+    >();
+
+    entries.forEach((entry) => {
+      if (entry.date < recentCustomerWindowStart || entry.date > todayKey) {
+        return;
+      }
+
+      const customer = entry.customer.trim();
+
+      if (!customer) {
+        return;
+      }
+
+      const customerKey = normalizeCustomerKey(customer);
+      const existingCustomer = customersByKey.get(customerKey);
+      const shouldReplaceCustomer =
+        !existingCustomer ||
+        entry.date > existingCustomer.lastDate ||
+        (entry.date === existingCustomer.lastDate && entry.createdAt > existingCustomer.lastCreatedAt);
+
+      customersByKey.set(customerKey, {
+        customer: shouldReplaceCustomer ? customer : existingCustomer.customer,
+        lastDate: shouldReplaceCustomer ? entry.date : existingCustomer.lastDate,
+        lastCreatedAt: shouldReplaceCustomer ? entry.createdAt : existingCustomer.lastCreatedAt,
+        count: (existingCustomer?.count ?? 0) + 1,
+      });
+    });
+
+    return [...customersByKey.values()]
+      .sort((a, b) => {
+        const dateCompare = b.lastDate.localeCompare(a.lastDate);
+        if (dateCompare !== 0) {
+          return dateCompare;
+        }
+
+        if (b.count !== a.count) {
+          return b.count - a.count;
+        }
+
+        if (b.lastCreatedAt !== a.lastCreatedAt) {
+          return b.lastCreatedAt - a.lastCreatedAt;
+        }
+
+        return a.customer.localeCompare(b.customer, 'pt-BR');
+      })
+      .map((item) => item.customer);
+  }, [entries, recentCustomerWindowStart, todayKey]);
 
   const stats = useMemo(() => {
     let totalOrders = entries.length;
@@ -1447,6 +1554,16 @@ export default function App() {
         </div>
       </section>
 
+      {isLocalMode && (
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950 print:hidden">
+          <p className="font-semibold">Auditoria local de teste</p>
+          <p className="mt-1 leading-6 text-amber-900">
+            A tela de consistencia esta lendo somente os dados salvos neste navegador. Por isso os conflitos do banco real
+            nao aparecem aqui enquanto o modo local estiver ativo.
+          </p>
+        </section>
+      )}
+
       <section className="grid grid-cols-1 gap-4 print:hidden md:grid-cols-2 xl:grid-cols-4">
         {[
           {
@@ -1942,6 +2059,15 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <button
+              onClick={handleOpenUpdateNotice}
+              className="flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-900 transition-colors hover:bg-sky-100"
+              title="Ver novidades da ultima atualizacao"
+            >
+              <Sparkles size={18} />
+              <span className="hidden sm:inline">Novidades</span>
+            </button>
+
             {visiblePage === 'expeditions' && (
               <button
                 onClick={handlePrint}
@@ -1977,10 +2103,10 @@ export default function App() {
 
             {isLocalMode ? (
               <button
-                onClick={resetTestData}
+                onClick={handleResetLocalTestData}
                 className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-100"
               >
-                Resetar teste
+                Resetar dados locais
               </button>
             ) : (
               <>
@@ -2008,13 +2134,16 @@ export default function App() {
                 <p className="mt-1 text-amber-900">
                   Tudo que voce cadastrar aqui fica salvo no navegador para voce ir testando sem depender do Firebase.
                 </p>
+                <p className="mt-1 text-amber-900">
+                  A auditoria de consistencia e o reset tambem operam so nesses dados locais. O banco real nao e lido nem alterado neste modo.
+                </p>
               </div>
 
               <button
-                onClick={resetTestData}
+                onClick={handleResetLocalTestData}
                 className="rounded-lg border border-amber-300 bg-white px-4 py-2 font-medium text-amber-900 transition-colors hover:bg-amber-100"
               >
-                Recarregar dados de exemplo
+                Recarregar exemplos locais
               </button>
             </div>
           </section>
@@ -2227,6 +2356,7 @@ export default function App() {
 
       {isFormOpen && (
         <ShippingForm
+          customerSuggestions={recentCustomerSuggestions}
           entry={editingEntry}
           onSave={handleSave}
           onClose={() => {
@@ -2235,6 +2365,12 @@ export default function App() {
           }}
         />
       )}
+
+      <UpdateNoticeModal
+        isOpen={isUpdateNoticeOpen}
+        notice={currentUpdateNotice}
+        onClose={handleCloseUpdateNotice}
+      />
     </div>
   );
 }
